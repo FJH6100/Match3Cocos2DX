@@ -1,0 +1,3 @@
+﻿  Building Custom Rule C:/Match3/cocos2d/external/clipper/CMakeLists.txt
+  clipper.cpp
+  ext_clipper.vcxproj -> C:\Match3\proj.win32\lib\Debug\ext_clipper.lib

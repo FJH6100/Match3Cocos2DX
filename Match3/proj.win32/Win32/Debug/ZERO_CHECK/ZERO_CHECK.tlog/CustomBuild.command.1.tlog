@@ -1,0 +1,10 @@
+^C:\MATCH3\PROJ.WIN32\CMAKEFILES\2A58D6524B2FD387CE907F84690AF531\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Match3 -BC:/Match3/proj.win32 --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Match3/proj.win32/Match3.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
