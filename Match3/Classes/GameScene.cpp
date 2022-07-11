@@ -72,20 +72,20 @@ bool Game::init()
 
     // add a label shows "Hello World"
     // create and initialize a label
-
-    auto label = Label::createWithTTF("Match 3", "fonts/Marker Felt.ttf", 24);
-    if (label == nullptr)
+    score = 0;
+    scoreLabel = Label::createWithTTF(cocos2d::StringUtils::format("%i", score), "fonts/Marker Felt.ttf", 24);
+    if (scoreLabel == nullptr)
     {
         problemLoading("'fonts/Marker Felt.ttf'");
     }
     else
     {
         // position the label on the center of the screen
-        label->setPosition(Vec2(origin.x + visibleSize.width / 2,
-            origin.y + visibleSize.height - label->getContentSize().height));
+        scoreLabel->setPosition(Vec2(origin.x + visibleSize.width / 2,
+            origin.y + visibleSize.height - scoreLabel->getContentSize().height));
 
         // add the label as a child to this layer
-        this->addChild(label, 1);
+        this->addChild(scoreLabel, 1);
     }
     //Set up touch events
     auto listener = EventListenerTouchOneByOne::create();
@@ -190,9 +190,6 @@ void Game::SwapPieces(float dt)
             pieces[endi][endj] = tempPiece;
             scheduleOnce(CC_SCHEDULE_SELECTOR(Game::RemoveMatches), .5f);
         }
-        startPiece = nullptr;
-        endPiece = nullptr;
-        starti, endi, startj, endj = NULL;
     }
 }
 
@@ -210,71 +207,69 @@ void Game::RemoveMatches(float dt)
         }
     }
     if (rowsMatched > 0)
+    {
+        for (Piece* p : removePieces)
+        {
+            this->removeChild(p->GetSprite());
+            p->SetSprite(nullptr);
+            score += 10;
+        }
+        removePieces.clear();
+        scoreLabel->setString(cocos2d::StringUtils::format("%i", score));
         scheduleOnce(CC_SCHEDULE_SELECTOR(Game::ShiftCells), .5f);
+        startPiece = nullptr;
+        endPiece = nullptr;
+        starti, endi, startj, endj = NULL;
+    }
+    else
+    {
+        if (startPiece != nullptr && endPiece != nullptr)
+        {
+            //Move pieces back if no match
+            Vec2 startLoc = startPiece->GetLoc();
+            Vec2 endLoc = endPiece->GetLoc();
+            startPiece->SetPiecePosition(endLoc);
+            endPiece->SetPiecePosition(startLoc);
+            Piece* tempPiece = pieces[starti][startj];
+            pieces[starti][startj] = pieces[endi][endj];
+            pieces[endi][endj] = tempPiece;
+        }
+    }
+    startPiece = nullptr;
+    endPiece = nullptr;
+    starti, endi, startj, endj = NULL;
 }
 
 void Game::CheckForMatches(Piece * checkThis, int i, int j)
 {
     std::vector<Piece*> verticalPieces;
     std::vector<Piece*> horizontalPieces;
+    int rightIncrement = 1;
+    int upIncrement = 1;
     //Up
-    if (i + 1 < 5)
+    while (i + upIncrement < 5)
     {
-        if (pieces[i + 1][j]->GetSprite() != nullptr && checkThis->GetColor() == pieces[i + 1][j]->GetColor())
+        if (pieces[i + upIncrement][j]->GetSprite() != nullptr && checkThis->GetColor() == pieces[i + upIncrement][j]->GetColor())
         {
-            verticalPieces.push_back((pieces[i + 1][j]));
-            if (i + 2 < 5)
-            {
-                if (pieces[i + 2][j]->GetSprite() != nullptr && checkThis->GetColor() == pieces[i + 2][j]->GetColor())
-                {
-                    verticalPieces.push_back((pieces[i + 2][j]));
-                }
-            }
+            verticalPieces.push_back((pieces[i + upIncrement][j]));
+            upIncrement++;
         }
-    }
-    //Down
-    if (i - 1 > -1)
-    {
-        if (pieces[i - 1][j]->GetSprite() != nullptr && checkThis->GetColor() == pieces[i - 1][j]->GetColor())
+        else
         {
-            verticalPieces.push_back((pieces[i - 1][j]));
-            if (i - 2 > -1)
-            {
-                if (pieces[i - 2][j]->GetSprite() != nullptr && checkThis->GetColor() == pieces[i - 2][j]->GetColor())
-                {
-                    verticalPieces.push_back((pieces[i - 2][j]));
-                }
-            }
+            break;
         }
     }
     //Right
-    if (j + 1 < 5)
+    while (j + rightIncrement < 5)
     {
-        if (pieces[i][j + 1]->GetSprite() != nullptr && checkThis->GetColor() == pieces[i][j + 1]->GetColor())
+        if (pieces[i][j + rightIncrement]->GetSprite() != nullptr && checkThis->GetColor() == pieces[i][j + rightIncrement]->GetColor())
         {
-            horizontalPieces.push_back((pieces[i][j + 1]));
-            if (j + 2 < 5)
-            {
-                if (pieces[i][j + 2]->GetSprite() != nullptr && checkThis->GetColor() == pieces[i][j + 2]->GetColor())
-                {
-                    horizontalPieces.push_back((pieces[i][j + 2]));
-                }
-            }
+            horizontalPieces.push_back((pieces[i][j + rightIncrement]));
+            rightIncrement++;
         }
-    }
-    //Left
-    if (j - 1 > -1)
-    {
-        if (pieces[i][j - 1]->GetSprite() != nullptr && checkThis->GetColor() == pieces[i][j - 1]->GetColor())
+        else
         {
-            horizontalPieces.push_back((pieces[i][j - 1]));
-            if (j - 2 > -1)
-            {
-                if (pieces[i][j - 2]->GetSprite() != nullptr && checkThis->GetColor() == pieces[i][j - 2]->GetColor())
-                {
-                    horizontalPieces.push_back((pieces[i][j - 2]));
-                }
-            }
+            break;
         }
     }
     if (verticalPieces.size() >= 2)
@@ -287,8 +282,7 @@ void Game::CheckForMatches(Piece * checkThis, int i, int j)
         rowsMatched++;
         for (Piece* p : verticalPieces)
         {
-            this->removeChild(p->GetSprite());
-            p->SetSprite(nullptr);           
+            removePieces.push_back(p);          
         }
     }
     if (horizontalPieces.size() >= 3)
@@ -296,8 +290,7 @@ void Game::CheckForMatches(Piece * checkThis, int i, int j)
         rowsMatched++;
         for (Piece* p : horizontalPieces)
         {
-            this->removeChild(p->GetSprite());
-            p->SetSprite(nullptr);
+            removePieces.push_back(p);
         }
     }
 }

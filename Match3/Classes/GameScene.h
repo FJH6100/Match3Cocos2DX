@@ -56,8 +56,11 @@ private:
     Piece * pieces[5][5];
     Piece * startPiece;
     Piece * endPiece;
+    std::vector<Piece*> removePieces;
     int starti, startj, endi, endj;
     int rowsMatched;
+    int score;
+    cocos2d::Label* scoreLabel;
 };
 
 #endif // __GAME_SCENE_H__s
