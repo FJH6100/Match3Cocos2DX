@@ -87,6 +87,21 @@ bool Game::init()
         // add the label as a child to this layer
         this->addChild(scoreLabel, 1);
     }
+    cascadeMultiplier = 0;
+    multiplierLabel = Label::createWithTTF(cocos2d::StringUtils::format("%s %i", "x", cascadeMultiplier), "fonts/Marker Felt.ttf", 24);
+    if (multiplierLabel == nullptr)
+    {
+        problemLoading("'fonts/Marker Felt.ttf'");
+    }
+    else
+    {
+        // position the label on the center of the screen
+        multiplierLabel->setPosition(Vec2(origin.x + visibleSize.width / 8,
+            origin.y + visibleSize.height - multiplierLabel->getContentSize().height));
+
+        // add the label as a child to this layer
+        this->addChild(multiplierLabel, 1);
+    }
     //Set up touch events
     auto listener = EventListenerTouchOneByOne::create();
     listener->setSwallowTouches(true);
@@ -208,11 +223,13 @@ void Game::RemoveMatches(float dt)
     }
     if (rowsMatched > 0)
     {
+        cascadeMultiplier++;
+        multiplierLabel->setString(cocos2d::StringUtils::format("%s %i", "x", cascadeMultiplier));
         for (Piece* p : removePieces)
         {
             this->removeChild(p->GetSprite());
             p->SetSprite(nullptr);
-            score += 10;
+            score += 10 * cascadeMultiplier;
         }
         removePieces.clear();
         scoreLabel->setString(cocos2d::StringUtils::format("%i", score));
@@ -223,6 +240,8 @@ void Game::RemoveMatches(float dt)
     }
     else
     {
+        cascadeMultiplier = 0;
+        multiplierLabel->setString(cocos2d::StringUtils::format("%s %i", "x", cascadeMultiplier));
         if (startPiece != nullptr && endPiece != nullptr)
         {
             //Move pieces back if no match

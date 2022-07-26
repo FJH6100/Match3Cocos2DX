@@ -1,5 +1,5 @@
 ﻿  GameScene.cpp
-..\Classes\GameScene.cpp(97,17): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-..\Classes\GameScene.cpp(98,17): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-..\Classes\GameScene.cpp(101,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+..\Classes\GameScene.cpp(112,17): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+..\Classes\GameScene.cpp(113,17): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+..\Classes\GameScene.cpp(116,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
   Match3.vcxproj -> C:\Match3\proj.win32\bin\Match3\Debug\Match3.exe

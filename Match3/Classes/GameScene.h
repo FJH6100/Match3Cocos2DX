@@ -60,7 +60,9 @@ private:
     int starti, startj, endi, endj;
     int rowsMatched;
     int score;
+    int cascadeMultiplier;
     cocos2d::Label* scoreLabel;
+    cocos2d::Label* multiplierLabel;
 };
 
 #endif // __GAME_SCENE_H__s
